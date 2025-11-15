@@ -14,13 +14,12 @@ default_args = {
 
 
 def extract(**context):
-    # mock extraction for now
     return [{"symbol": "BTC"}, {"symbol": "ETH"}]
 
 
 def land(**context):
     # placeholder for landing raw data
-    # you can pull XCom from extract using context['ti'].xcom_pull()
+    # can pull XCom from extract using context['ti'].xcom_pull()
     pass
 
 
