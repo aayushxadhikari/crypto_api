@@ -1,131 +1,220 @@
-CRYPTO_API – Crypto Market ETL Pipeline (Airflow + Prefect + Docker)
+# Crypto Market ETL Pipeline
 
-This project implements an automated ETL pipeline for extracting cryptocurrency market data from external APIs, storing raw data, transforming it, and loading it into a warehouse for analytics.
-It supports two orchestration engines: Apache Airflow (production) and Prefect (lightweight).
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?logo=docker&logoColor=white)](https://www.docker.com/)
 
-The entire pipeline can be run locally using Docker Compose.
+A production-ready ETL pipeline for extracting, transforming, and loading cryptocurrency market data. Built with **Apache Airflow** and **Prefect** orchestration engines, containerized with Docker for seamless deployment.
 
-📁 Project Structure
-CRYPTO_API/
-│
-├── airflow/
-│   └── dags/
-│       └── crypto_api_warehouse_dag1.py      # Airflow DAG for ETL
-│
-├── docker-compose.yml                         # Airflow + Postgres Docker setup
-│
-├── landing_raw/                               # Raw JSON crypto API data
-│
-├── src/
-│   └── prefect_flow.py                        # Prefect implementation of ETL
-│
-├── venv/                                      # Local Python virtual environment
-│
-├── requirements.txt                           # Python dependencies
-└── README.md
+## 🎯 Overview
 
-🚀 Overview
+This project implements an automated ETL (Extract, Transform, Load) pipeline that:
+- Fetches real-time cryptocurrency market data from external APIs
+- Transforms and cleans data for analytics
+- Loads processed data into a PostgreSQL data warehouse
+- Supports dual orchestration: Airflow (production) and Prefect (development)
 
-This application collects real-time cryptocurrency price data and loads it into a warehouse. It includes:
+## ✨ Features
 
-✔ Extraction
+- **Multi-Orchestrator Support**: Choose between Apache Airflow or Prefect based on your needs
+- **Dockerized Deployment**: Complete containerization for consistent environments
+- **Raw Data Persistence**: All API responses saved as timestamped JSON files
+- **Scalable Architecture**: Modular design for easy extension to multiple crypto sources
+- **Data Quality**: Built-in validation and transformation steps
+- **Retry Logic**: Automatic retry mechanisms for failed API calls
+- **Incremental Loading**: Efficient data warehouse updates
 
-Fetch crypto prices via REST API
+## 🏗️ Architecture
 
-Save raw API responses to landing_raw/
+```
+┌─────────────────┐
+│  Crypto APIs    │
+│ (CoinGecko, etc)│
+└────────┬────────┘
+         │
+         │ Extract
+         ▼
+┌─────────────────┐
+│  Landing Zone   │
+│  (Raw JSON)     │
+└────────┬────────┘
+         │
+         │ Transform
+         ▼
+┌─────────────────┐
+│  Staging Area   │
+│  (Cleaned Data) │
+└────────┬────────┘
+         │
+         │ Load
+         ▼
+┌─────────────────┐
+│   PostgreSQL    │
+│  Data Warehouse │
+└─────────────────┘
+```
 
-✔ Transformation
+**Tech Stack:**
+- **Orchestration**: Apache Airflow 2.x, Prefect 2.x
+- **Storage**: PostgreSQL 13+
+- **Containerization**: Docker, Docker Compose
+- **Language**: Python 3.8+
+- **Data Processing**: Pandas, SQLAlchemy
 
-Flatten JSON
+## 📦 Prerequisites
 
-Select relevant fields (symbol, price, timestamp, etc.)
+Before you begin, ensure you have the following installed:
 
-✔ Load
+- **Docker** (20.10+) and **Docker Compose** (2.0+)
+- **Python** (3.8+) - for local development
 
-Load transformed data into a data warehouse (PostgreSQL or any DB)
+## 🚀 Quick Start
 
-✔ Orchestration
+Get the pipeline running in 3 simple steps:
 
-Airflow DAG (Production / Scheduler)
+```bash
+# 1. Clone the repository
+git clone https://github.com/yourusername/crypto_api.git
+cd crypto_api
 
-Prefect Flow (Lightweight local runs)
+# 2. Start all services with Docker Compose
+docker-compose up --build -d
 
-🐳 Running With Docker (Recommended)
-1️⃣ Start Airflow + Services
+# 3. Access Airflow UI
+# Open browser: http://localhost:8080
+# Login: airflow / airflow
+```
 
-From the project root:
+## 💻 Installation
 
-docker-compose up --build
+### Option 1: Docker (Recommended)
 
+```bash
+# Start all services
+docker-compose up -d
 
-This boots:
+# View logs
+docker-compose logs -f
 
-Airflow Scheduler
+# Stop services
+docker-compose down
 
-Airflow Webserver
+# Stop and remove volumes
+docker-compose down -v
+```
 
-Postgres (if configured)
+### Option 2: Local Python Environment
 
-2️⃣ Access Airflow UI
-
-👉 http://localhost:8080
-
-Default login:
-
-user: airflow
-pass: airflow
-
-3️⃣ Run the ETL
-
-Enable and trigger:
-
-crypto_api_warehouse_dag1
-
-▶️ Running the Prefect Flow
-
-If you want to run ETL without Airflow:
-
-python src/prefect_flow.py
-
-
-This fetches crypto data and writes it to landing_raw/.
-
-📦 Data Flow
-1. Raw Zone → /landing_raw/
-
-All API responses are stored as timestamped .json files:
-
-landing_raw/
-   ├── btc_2025-11-16.json
-   ├── eth_2025-11-16.json
-   └── ...
-
-2. Warehouse (PostgreSQL or Any DB)
-
-The DAG/Flow loads cleaned data into your analytical database.
-
-A typical schema:
-
-column	type
-symbol	TEXT
-price_usd	FLOAT
-time_fetched	TIMESTAMP
-⚙️ Installation (Local Python Option)
+```bash
+# Create virtual environment
 python3 -m venv venv
-source venv/bin/activate         # macOS/Linux
-venv\Scripts\activate            # Windows
 
+# Activate virtual environment
+# On macOS/Linux:
+source venv/bin/activate
+# On Windows:
+venv\Scripts\activate
+
+# Install dependencies
 pip install -r requirements.txt
 
+# Initialize Airflow database (first time only)
+airflow db init
 
-🌱 Future Improvements
+# Create Airflow admin user
+airflow users create \
+    --username admin \
+    --firstname Admin \
+    --lastname User \
+    --role Admin \
+    --email admin@example.com
 
-Add DBT transformations
+# Start Airflow webserver
+airflow webserver --port 8080
 
-Persist Parquet files
+# In a new terminal, start scheduler
+airflow scheduler
+```
 
-Add S3/GCS storage layers
 
-Add metrics monitoring (Grafana/Prometheus)
+### Running with Prefect
 
-Add retry/alerting in Airflow and Prefect
+For lightweight local runs without Airflow:
+
+```bash
+# Activate your virtual environment
+source venv/bin/activate
+
+# Run the Prefect flow
+python src/prefect_flow.py
+
+# Monitor in Prefect UI (optional)
+prefect server start
+# Then navigate to http://localhost:4200
+```
+
+## 🔄 Data Flow
+
+### 1. **Extract Phase**
+- Fetches cryptocurrency data from external APIs (CoinGecko, Binance, etc.)
+- Stores raw API responses in `landing_raw/` as timestamped JSON files
+- Format: `{symbol}_{YYYY-MM-DD_HH-MM-SS}.json`
+
+### 2. **Transform Phase**
+- Reads raw JSON files
+- Flattens nested structures
+- Extracts relevant fields:
+  - `symbol`: Cryptocurrency ticker (e.g., BTC, ETH)
+  - `price_usd`: Current price in USD
+  - `volume_24h`: 24-hour trading volume
+  - `market_cap`: Total market capitalization
+  - `timestamp`: Data fetch timestamp
+- Performs data validation and cleaning
+
+### 3. **Load Phase**
+- Connects to PostgreSQL warehouse
+- Creates tables if they don't exist
+- Performs upsert operations (insert or update)
+- Maintains data lineage
+
+### Warehouse Schema
+
+```sql
+CREATE TABLE crypto_prices (
+    id SERIAL PRIMARY KEY,
+    symbol VARCHAR(10) NOT NULL,
+    price_usd DECIMAL(20, 8),
+    volume_24h DECIMAL(20, 2),
+    market_cap DECIMAL(20, 2),
+    timestamp TIMESTAMP NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(symbol, timestamp)
+);
+
+CREATE INDEX idx_symbol_timestamp ON crypto_prices(symbol, timestamp);
+```
+
+## 📊 Monitoring
+
+### Airflow Monitoring
+- **Web UI**: `http://localhost:8080`
+- Monitor DAG runs, task status, and logs
+- View Gantt charts and task duration
+- Configure email alerts for failures
+
+### Prefect Monitoring
+- **UI**: `http://localhost:4200` (after running `prefect server start`)
+- Real-time flow run monitoring
+- Automatic retry tracking
+- Task dependency visualization
+
+### Logs Location
+```bash
+# Airflow logs
+./logs/
+
+# Docker container logs
+docker-compose logs -f airflow-webserver
+docker-compose logs -f airflow-scheduler
+```
+
