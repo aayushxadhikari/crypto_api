@@ -1,6 +1,5 @@
 # Crypto Market ETL Pipeline
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?logo=docker&logoColor=white)](https://www.docker.com/)
 
@@ -192,29 +191,5 @@ CREATE TABLE crypto_prices (
 );
 
 CREATE INDEX idx_symbol_timestamp ON crypto_prices(symbol, timestamp);
-```
-
-## 📊 Monitoring
-
-### Airflow Monitoring
-- **Web UI**: `http://localhost:8080`
-- Monitor DAG runs, task status, and logs
-- View Gantt charts and task duration
-- Configure email alerts for failures
-
-### Prefect Monitoring
-- **UI**: `http://localhost:4200` (after running `prefect server start`)
-- Real-time flow run monitoring
-- Automatic retry tracking
-- Task dependency visualization
-
-### Logs Location
-```bash
-# Airflow logs
-./logs/
-
-# Docker container logs
-docker-compose logs -f airflow-webserver
-docker-compose logs -f airflow-scheduler
 ```
 
